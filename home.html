@@ -1,0 +1,38 @@
+<!DOCTYPE html> <!--ensures that the browser renders the page in standard mode-->
+<html lang="en"> <!--specifies the language of the document-->
+    <head>
+        <!--meta data that is not visible to users, but useful for browsers-->
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>BlackBox</title>
+        <link rel="stylesheet" href="CSS\style.css">
+        <script type="module" src="javascript\src.js" defer></script>
+    </head>
+    <!--body of the page-->
+
+    <body>
+        <header> <!--header typically contains logo and navigation panel-->
+            <h1>BlackBox</h1>
+            <nav>
+                <a href="home.html">Home</a>
+                <a href="about.html">About</a>
+                <a href="signup.html">Log Out</a>
+            </nav>
+        </header>
+        <main> <!--main body-->
+            <h2 id="welcome-message">Welcome back </h2>
+            <input type="text" id="input-el" placeholder="enter location here">
+            <button id="enter-btn">Enter</button>
+
+            <ul id="storage-el"></ul> <!--stored elements show up here-->
+
+            <button id="generate-btn">Generate</button> <!--press this button to retrieve random location-->
+            <p id="output-display">Location: </p> <!--retrieved elements show up here-->
+        </main>
+
+        <footer> <!--copyright, logo etc-->
+
+        </footer>
+
+    </body>
+</html>

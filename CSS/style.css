@@ -1,0 +1,16 @@
+header {
+    font-weight: bold;
+    background-color: black;
+    color: white;
+    text-align: center;
+    padding: none;
+    margin: 0px;
+    display: flex;
+    flex-direction: column;
+}
+
+nav {
+    display: flex;
+    justify-content: space-around;
+}
+
