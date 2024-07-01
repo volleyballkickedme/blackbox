@@ -5,7 +5,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>BlackBox</title>
-        <link rel="stylesheet" href="CSS\style.css">
+        <link rel="stylesheet" href="CSS\home.css">
         <script type="module" src="javascript\src.js" defer></script>
     </head>
     <!--body of the page-->
@@ -20,23 +20,27 @@
             </nav>
         </header>
         <main> <!--main body-->
+            <h2 id="welcome-message">Welcome back </h2>
             <div class="container">
-                <div class="userInterface">
-                    <div id="input">
-                        <h2 id="welcome-message">Welcome back </h2>
-                        <input type="text" id="input-el" placeholder="enter location here">
+                <div class="input">
+                    <div class="userInput">
+                        <label for="input-el">Enter location:</label>
+                        <input type="text" id="input-el" placeholder="e.g. Singapore...">
                         <button id="enter-btn">Enter</button>
                     </div>
-                    
-                    <div id="output">
+                    <div class="storage">
+                        <ul id="storage-el" class="list"></ul> <!--stored elements show up here-->
+                    </div>
+                </div>
+
+                <div class="output">
+                    <div class="generate">
                         <!--generate button-->
                         <button id="generate-btn">Generate</button> <!--press this button to retrieve random location-->
                     </div>
-                </div>
-                
-                <div class="display">
-                    <p id="output-display">Location: </p> <!--retrieved elements show up here-->
-                    <ul id="storage-el"></ul> <!--stored elements show up here-->
+                    <div class="display">
+                        <p id="output-display"></p> <!--retrieved elements show up here-->
+                    </div>    
                 </div>
             </div>
         </main>
