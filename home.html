@@ -20,14 +20,25 @@
             </nav>
         </header>
         <main> <!--main body-->
-            <h2 id="welcome-message">Welcome back </h2>
-            <input type="text" id="input-el" placeholder="enter location here">
-            <button id="enter-btn">Enter</button>
-
-            <ul id="storage-el"></ul> <!--stored elements show up here-->
-
-            <button id="generate-btn">Generate</button> <!--press this button to retrieve random location-->
-            <p id="output-display">Location: </p> <!--retrieved elements show up here-->
+            <div class="container">
+                <div class="userInterface">
+                    <div id="input">
+                        <h2 id="welcome-message">Welcome back </h2>
+                        <input type="text" id="input-el" placeholder="enter location here">
+                        <button id="enter-btn">Enter</button>
+                    </div>
+                    
+                    <div id="output">
+                        <!--generate button-->
+                        <button id="generate-btn">Generate</button> <!--press this button to retrieve random location-->
+                    </div>
+                </div>
+                
+                <div class="display">
+                    <p id="output-display">Location: </p> <!--retrieved elements show up here-->
+                    <ul id="storage-el"></ul> <!--stored elements show up here-->
+                </div>
+            </div>
         </main>
 
         <footer> <!--copyright, logo etc-->

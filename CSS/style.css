@@ -14,3 +14,25 @@ nav {
     justify-content: space-around;
 }
 
+.container {
+    height: 100%;
+    width: 100%;
+    background-color: blue;
+    color: white;
+    display: flex;
+
+}
+
+.display {
+    background-color: green;
+    color: white;
+}
+
+#input {
+    background-color: blueviolet;
+}
+
+#output {
+    background-color: crimson;
+}
+
