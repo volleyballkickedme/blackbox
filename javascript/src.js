@@ -92,3 +92,36 @@ function displayRefresh() {
     }
   })
 }
+
+
+//generate button functionality
+generateButton.addEventListener('click', function() {
+  //fetch current database
+  onValue(locationList, function(snapshot) {
+    if(snapshot.exists()) {
+      outputDisplay.textContent = "Location: "
+      //retrieve value set and convert to array
+      let outputArray = Object.values(snapshot.val())
+      const output = randomGenerator(outputArray)
+      outputDisplay.textContent += output 
+    }
+    else {
+      outputDisplay.textContent = "Location: "
+    }
+  })
+})
+//function to generate a random location from a given array
+function randomGenerator(array) {
+  //array consists of all the locations stored in the database
+  //generate a random index within range of the array size
+  const index = randomNumberGenerator(0, array.length)
+  //output element is the element at the generated index, return output element
+  return array[index]
+}
+
+//random number generator
+function randomNumberGenerator(min, max) {
+  min = Math.ceil(min); // Round up to the nearest integer
+  max = Math.floor(max); // Round down to the nearest integer
+  return Math.floor(Math.random() * (max - min)) + min;
+}
