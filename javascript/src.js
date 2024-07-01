@@ -1,6 +1,6 @@
 //import statements
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js'
-import {getDatabase, ref, remove, set, push} from 'https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js'
+import {getDatabase, ref, remove, set, push, onValue} from 'https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js'
 
 //firebase setup
 const firebaseConfig = {
@@ -31,6 +31,9 @@ const locationElement = document.getElementById('location-el')
 const database = getDatabase(app)
 const locationList = ref(database, "Locations")
 
+//initialize the display
+displayRefresh()
+
 //Functionality for submit button
 submitButton.addEventListener('click', function() {
     const userInput = inputField.value
@@ -40,11 +43,10 @@ submitButton.addEventListener('click', function() {
         const newItemRef = push(locationList)
         //set sets the value of the newly created child, as push only creates the key
         set(newItemRef, userInput)
-        //add to display
-        const location = document.createElement('li')
-        location.setAttribute('id', 'location-el')
-        location.textContent = userInput
-        locationDisplay.append(location)
+        
+        //refresh the display with latest elements from database
+        displayRefresh()
+
         //clear input field
         inputField.value = ''
     }
@@ -55,11 +57,71 @@ submitButton.addEventListener('click', function() {
 function handleDoubleClick(event) {
   const target = event.target;
   if (target.tagName.toLowerCase() === 'li') {
-    // Remove the clicked <li> element
-    target.remove();
     //remove from database
-    
+    //obtain reference of object to be removed
+    let deletePointer = ref(database, `Locations/${target.id}`)
+    remove(deletePointer)
+    //update display
+    displayRefresh()
   }
 }
 // Add event listener to <ul> to handle double-click on <li> items
 locationDisplay.addEventListener('dblclick', handleDoubleClick);
+
+//function to refresh the display list
+function displayRefresh() {
+  //fetch items from database and store them in an array
+  onValue(locationList, function(snapshot) {
+    if(snapshot.exists()) {
+      let locationsArray = Object.entries(snapshot.val())
+      //clear the current display
+      locationDisplay.innerHTML = ""
+      //iterate through the list and append each item onto the display
+      for(let i = 0; i < locationsArray.length; i++) {
+        //add to display
+        const location = document.createElement('li')
+        //set ID of the li item to be the same as the ID in firebase for ease of access
+        location.setAttribute('id', locationsArray[i][0])
+        location.textContent = locationsArray[i][1]
+        //add the new entry to the list
+        locationDisplay.append(location)
+      }
+    }
+    else {
+      locationDisplay.innerHTML = "Start adding locations..."
+    }
+  })
+}
+
+
+//generate button functionality
+generateButton.addEventListener('click', function() {
+  //fetch current database
+  onValue(locationList, function(snapshot) {
+    if(snapshot.exists()) {
+      outputDisplay.textContent = "Location: "
+      //retrieve value set and convert to array
+      let outputArray = Object.values(snapshot.val())
+      const output = randomGenerator(outputArray)
+      outputDisplay.textContent += output 
+    }
+    else {
+      outputDisplay.textContent = "Location: "
+    }
+  })
+})
+//function to generate a random location from a given array
+function randomGenerator(array) {
+  //array consists of all the locations stored in the database
+  //generate a random index within range of the array size
+  const index = randomNumberGenerator(0, array.length)
+  //output element is the element at the generated index, return output element
+  return array[index]
+}
+
+//random number generator
+function randomNumberGenerator(min, max) {
+  min = Math.ceil(min); // Round up to the nearest integer
+  max = Math.floor(max); // Round down to the nearest integer
+  return Math.floor(Math.random() * (max - min)) + min;
+}
