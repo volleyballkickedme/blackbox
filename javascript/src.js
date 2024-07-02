@@ -88,7 +88,7 @@ function displayRefresh() {
       }
     }
     else {
-      locationDisplay.innerHTML = "s"
+      locationDisplay.innerHTML = ""
     }
   })
 }
