@@ -1,6 +1,6 @@
 //import statements
 import {initializeApp} from 'https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js'
-import {getDatabase, ref, remove, set, push, onValue} from 'https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js'
+import {getDatabase, ref, remove, set, push, onValue, orderByChild} from 'https://www.gstatic.com/firebasejs/9.1.3/firebase-database.js'
 
 //firebase setup
 const firebaseConfig = {
@@ -21,15 +21,21 @@ let welcomeMessage = document.getElementById('welcome-el')
 let inputField = document.getElementById('input-el')
 let locationDisplay = document.getElementById('storage-el')
 let outputDisplay = document.getElementById('output-display')
+let typeSelector = document.getElementById('type-el')
 
 //buttons
 const submitButton = document.getElementById('enter-btn')
 const generateButton = document.getElementById('generate-btn')
 const locationElement = document.getElementById('location-el')
 
-//initialize database and a list of locations
+//initialize database
 const database = getDatabase(app)
-const locationList = ref(database, "Locations")
+const activityList = ref(database, "Activities")
+const breakfastList = ref(database, "Breakfast")
+const lunchList = ref(database, "Lunch")
+const dinnerList = ref(database, "Dinner")
+
+//decide the node that the data should be stored under
 
 //initialize the display
 displayRefresh()
@@ -37,18 +43,35 @@ displayRefresh()
 //Functionality for submit button
 submitButton.addEventListener('click', function() {
     const userInput = inputField.value
-    if(userInput != '') {
-        //add to database
-        //push item to database, push creates a new node under the specified parent with a unique key and returns a reference to the latest item added
-        const newItemRef = push(locationList)
-        //set sets the value of the newly created child, as push only creates the key
-        set(newItemRef, userInput)
+    const type = typeSelector.value
+    let nodeSelector = 1;
+    if(userInput != '' && type != "") {
+      //select relevant node to push data to
+      if(type == "breakfast") {
+        nodeSelector = breakfastList
+      }
+      else if(type == "lunch") {
+        nodeSelector = lunchList
+      }
+      else if(type == "dinner") {
+        nodeSelector = dinnerList
+      }
+      else if(type == "activity") {
+        nodeSelector = activityList
+      }
+      //add to database
+      //push item to database, push creates a new node under the specified parent with a unique key and returns a reference to the latest item added
+      const newItemRef = push(nodeSelector, userInput)
+      //set sets the value of the newly created child, as push only creates the key
+      set(newItemRef, userInput)
         
-        //refresh the display with latest elements from database
-        displayRefresh()
+      //refresh the display with latest elements from database
+      displayRefresh()
 
-        //clear input field
-        inputField.value = ''
+      //clear input field
+      inputField.value = ''
+      typeSelector.selectedIndex = 0
+
     }
 })
 
@@ -58,9 +81,18 @@ function handleDoubleClick(event) {
   const target = event.target;
   if (target.tagName.toLowerCase() === 'li') {
     //remove from database
-    //obtain reference of object to be removed
-    let deletePointer = ref(database, `Locations/${target.id}`)
-    remove(deletePointer)
+    //obtain reference of parent of object
+    const childID = target.id
+
+    database.orderByChild(childID).once('value', (snapshot) => {
+      if(snapshot.exists()) {
+        const parentSnapshot = snapshot.ref.parentSnapshot
+        const parentKey = parentSnapshot.key
+        const parentRef = ref(database, parentKey)
+        let deletePointer = ref(database, `${parentRef}/${target.id}`)
+        remove(deletePointer)
+      }
+    })
     //update display
     displayRefresh()
   }
@@ -70,34 +102,42 @@ locationDisplay.addEventListener('dblclick', handleDoubleClick);
 
 //function to refresh the display list
 function displayRefresh() {
-  //fetch items from database and store them in an array
-  onValue(locationList, function(snapshot) {
-    if(snapshot.exists()) {
-      let locationsArray = Object.entries(snapshot.val())
-      //clear the current display
-      locationDisplay.innerHTML = ""
-      //iterate through the list and append each item onto the display
-      for(let i = 0; i < locationsArray.length; i++) {
-        //add to display
-        const location = document.createElement('li')
-        //set ID of the li item to be the same as the ID in firebase for ease of access
-        location.setAttribute('id', locationsArray[i][0])
-        location.textContent = locationsArray[i][1]
-        //add the new entry to the list
-        locationDisplay.append(location)
+  // Clear the current display
+  locationDisplay.innerHTML = "";
+
+  // Define an array of lists and their corresponding Firebase references
+  const lists = [
+    { name: "Activities", ref: activityList },
+    { name: "Breakfast", ref: breakfastList },
+    { name: "Lunch", ref: lunchList },
+    { name: "Dinner", ref: dinnerList }
+  ];
+
+  // Iterate through each list
+  lists.forEach(list => {
+    // Fetch items from the database
+    onValue(list.ref, function(snapshot) {
+      if(snapshot.exists()) {
+        // Convert snapshot to an array of key-value pairs
+        const dataArray = Object.entries(snapshot.val());
+        
+        // Iterate through the array and append each item onto the display
+        dataArray.forEach(([key, value]) => {
+          const location = document.createElement('li');
+          location.setAttribute('id', key); // Set ID of the li item
+          location.textContent = value;
+          locationDisplay.append(location);
+        });
       }
-    }
-    else {
-      locationDisplay.innerHTML = ""
-    }
-  })
+    });
+  });
 }
 
 
 //generate button functionality
 generateButton.addEventListener('click', function() {
   //fetch current database
-  onValue(locationList, function(snapshot) {
+  onValue(activityList, function(snapshot) {
     if(snapshot.exists()) {
       outputDisplay.textContent = ""
       //retrieve value set and convert to array
@@ -112,7 +152,7 @@ generateButton.addEventListener('click', function() {
 })
 //function to generate a random location from a given array
 function randomGenerator(array) {
-  //array consists of all the locations stored in the database
+  //array consists of all the Activities stored in the database
   //generate a random index within range of the array size
   const index = randomNumberGenerator(0, array.length)
   //output element is the element at the generated index, return output element
