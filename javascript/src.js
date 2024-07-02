@@ -75,30 +75,6 @@ submitButton.addEventListener('click', function() {
     }
 })
 
-//Remove element from display/database
-// Function to handle double-click event
-function handleDoubleClick(event) {
-  const target = event.target;
-  if (target.tagName.toLowerCase() === 'li') {
-    //remove from database
-    //obtain reference of parent of object
-    const childID = target.id
-
-    database.orderByChild(childID).once('value', (snapshot) => {
-      if(snapshot.exists()) {
-        const parentSnapshot = snapshot.ref.parentSnapshot
-        const parentKey = parentSnapshot.key
-        const parentRef = ref(database, parentKey)
-        let deletePointer = ref(database, `${parentRef}/${target.id}`)
-        remove(deletePointer)
-      }
-    })
-    //update display
-    displayRefresh()
-  }
-}
-// Add event listener to <ul> to handle double-click on <li> items
-locationDisplay.addEventListener('dblclick', handleDoubleClick);
 
 //function to refresh the display list
 function displayRefresh() {
@@ -123,9 +99,16 @@ function displayRefresh() {
         
         // Iterate through the array and append each item onto the display
         dataArray.forEach(([key, value]) => {
-          const location = document.createElement('li');
-          location.setAttribute('id', key); // Set ID of the li item
+          const location = document.createElement('div');
+          location.classList.add(key); // Set ID of the li item
           location.textContent = value;
+
+          //add functionality to remove
+          location.addEventListener('dblclick', function() {
+            let removePointer = ref(database, `${list.name}/${key}`)
+            remove(removePointer)
+            displayRefresh()
+          })
           locationDisplay.append(location);
         });
       }
