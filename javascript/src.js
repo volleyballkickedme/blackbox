@@ -88,7 +88,7 @@ function displayRefresh() {
       }
     }
     else {
-      locationDisplay.innerHTML = "Start adding locations..."
+      locationDisplay.innerHTML = ""
     }
   })
 }
@@ -99,14 +99,14 @@ generateButton.addEventListener('click', function() {
   //fetch current database
   onValue(locationList, function(snapshot) {
     if(snapshot.exists()) {
-      outputDisplay.textContent = "Location: "
+      outputDisplay.textContent = ""
       //retrieve value set and convert to array
       let outputArray = Object.values(snapshot.val())
       const output = randomGenerator(outputArray)
-      outputDisplay.textContent += output 
+      outputDisplay.textContent = output 
     }
     else {
-      outputDisplay.textContent = "Location: "
+      outputDisplay.textContent = ""
     }
   })
 })
