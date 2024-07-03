@@ -25,7 +25,7 @@
                 <div class="input">
                     <div class="userInput">
                         <label for="type-el">Type of activity: </label>
-                        <select name="activity-type" id="type-el">
+                        <select id="type-el">
                             <option value="" disabled selected></option>
                             <option value="breakfast">Breakfast</option>
                             <option value="lunch">Lunch</option>
@@ -37,12 +37,20 @@
                         <button id="enter-btn">Enter</button>
                     </div>
                     <div class="storage">
-                        <ul id="storage-el" class="list"></ul> <!--stored elements show up here-->
+                        <ul id="storage-el"></ul> <!--stored elements show up here-->
                     </div>
                 </div>
 
                 <div class="output">
                     <div class="generate">
+                        <label for="generate-selector">Location type:</label>
+                        <select id="generate-selector">
+                            <option value="" disabled selected></option>
+                            <option value="breakfast">Breakfast</option>
+                            <option value="lunch">Lunch</option>
+                            <option value="dinner">Dinner</option>
+                            <option value="activity">Activity</option>
+                        </select>
                         <!--generate button-->
                         <button id="generate-btn">Generate</button> <!--press this button to retrieve random location-->
                     </div>

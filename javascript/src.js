@@ -17,16 +17,18 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 //define variables
-let welcomeMessage = document.getElementById('welcome-el')
-let inputField = document.getElementById('input-el')
-let locationDisplay = document.getElementById('storage-el')
-let outputDisplay = document.getElementById('output-display')
-let typeSelector = document.getElementById('type-el')
+const welcomeMessage = document.getElementById('welcome-el')
+const inputField = document.getElementById('input-el')
+const locationDisplay = document.getElementById('storage-el')
+const inputTypeSelector = document.getElementById('type-el')
+
+
+const outputDisplay = document.getElementById('output-display')
+const outputTypeSelector = document.getElementById('generate-selector')
 
 //buttons
 const submitButton = document.getElementById('enter-btn')
 const generateButton = document.getElementById('generate-btn')
-const locationElement = document.getElementById('location-el')
 
 //initialize database
 const database = getDatabase(app)
@@ -34,6 +36,26 @@ const activityList = ref(database, "Activities")
 const breakfastList = ref(database, "Breakfast")
 const lunchList = ref(database, "Lunch")
 const dinnerList = ref(database, "Dinner")
+
+//dictionary dupe
+const types = {
+  "breakfast" : breakfastList,
+  "lunch" : lunchList, 
+  "dinner" : dinnerList,
+  "activity" : activityList
+}
+
+//function that returns the database pointer based on the input field value
+const typeArray = Object.entries(types)
+function databasePointer(input) {
+  for(let i = 0; i < typeArray.length; i++) {
+    if(input == typeArray[i][0]) {
+      return typeArray[i][1]
+    }
+  }
+  return database;
+}
+
 
 //decide the node that the data should be stored under
 
@@ -43,25 +65,12 @@ displayRefresh()
 //Functionality for submit button
 submitButton.addEventListener('click', function() {
     const userInput = inputField.value
-    const type = typeSelector.value
-    let nodeSelector = 1;
+    const type = inputTypeSelector.value
     if(userInput != '' && type != "") {
       //select relevant node to push data to
-      if(type == "breakfast") {
-        nodeSelector = breakfastList
-      }
-      else if(type == "lunch") {
-        nodeSelector = lunchList
-      }
-      else if(type == "dinner") {
-        nodeSelector = dinnerList
-      }
-      else if(type == "activity") {
-        nodeSelector = activityList
-      }
       //add to database
       //push item to database, push creates a new node under the specified parent with a unique key and returns a reference to the latest item added
-      const newItemRef = push(nodeSelector, userInput)
+      const newItemRef = push(databasePointer(type), userInput)
       //set sets the value of the newly created child, as push only creates the key
       set(newItemRef, userInput)
         
@@ -70,11 +79,10 @@ submitButton.addEventListener('click', function() {
 
       //clear input field
       inputField.value = ''
-      typeSelector.selectedIndex = 0
+      inputTypeSelector.selectedIndex = 0
 
     }
 })
-
 
 //function to refresh the display list
 function displayRefresh() {
@@ -99,9 +107,10 @@ function displayRefresh() {
         
         // Iterate through the array and append each item onto the display
         dataArray.forEach(([key, value]) => {
-          const location = document.createElement('div');
-          location.classList.add(key); // Set ID of the li item
+          const location = document.createElement('li');
+          location.setAttribute('id', key); // Set ID of the li item
           location.textContent = value;
+          locationDisplay.appendChild(location)
 
           //add functionality to remove
           location.addEventListener('dblclick', function() {
@@ -119,8 +128,10 @@ function displayRefresh() {
 
 //generate button functionality
 generateButton.addEventListener('click', function() {
+  const outputType = outputTypeSelector.value
+
   //fetch current database
-  onValue(activityList, function(snapshot) {
+  onValue(databasePointer(outputType), function(snapshot) {
     if(snapshot.exists()) {
       outputDisplay.textContent = ""
       //retrieve value set and convert to array
