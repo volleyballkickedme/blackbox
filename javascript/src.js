@@ -138,12 +138,19 @@ generateButton.addEventListener('click', function() {
       let outputArray = Object.values(snapshot.val())
       const output = randomGenerator(outputArray)
       outputDisplay.textContent = output 
+      outputTypeSelector.selectedIndex = 0
     }
     else {
       outputDisplay.textContent = ""
     }
   })
 })
+
+//clear the output display
+outputDisplay.addEventListener('click', function() {
+  outputDisplay.textContent = ''
+})
+
 //function to generate a random location from a given array
 function randomGenerator(array) {
   //array consists of all the Activities stored in the database
